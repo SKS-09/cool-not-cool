@@ -7,9 +7,9 @@ import { fetchTrendingWithFilter } from '../../../lib/trending';
 export const runtime = 'edge';
 
 function warpcastUrl(username?: string, hash?: string) {
-  if (!username || !hash) return 'https://warpcast.com/';
+  if (!username || !hash) return 'https://farcaster.xyz/';
   const short = hash?.startsWith('0x') ? hash.slice(2, 10) : hash?.slice(0, 8);
-  return `https://warpcast.com/${username}/${short}`;
+  return `https://farcaster.xyz/${username}/${short}`;
 }
 
 // Normalize embeds from various shapes
@@ -31,7 +31,7 @@ async function handle(req: NextRequest) {
     }
 
     const url = req.nextUrl;
-    const forceUrl = url.searchParams.get('url');          // optional: full Warpcast URL
+    const forceUrl = url.searchParams.get('url');          // optional: full Farcaster URL
     const forceHash = url.searchParams.get('hash');        // optional: 0x... cast hash
     const forceUser = url.searchParams.get('username');    // optional: improves URL
     const forceText = url.searchParams.get('force_text');  // optional: fallback text
@@ -57,7 +57,7 @@ async function handle(req: NextRequest) {
     if (forceUrl) {
       const r = await fetch(
         `https://api.neynar.com/v2/farcaster/cast?identifier=${encodeURIComponent(forceUrl)}&type=url`,
-        { headers: { 'api_key': apiKey } }
+        { headers: { 'x-api-key': apiKey } }
       );
 
       if (!r.ok) {
@@ -65,7 +65,6 @@ async function handle(req: NextRequest) {
         if (!forceText) {
           return NextResponse.json({ ok: false, error: errTxt || 'force_url_fetch_failed' }, { status: 500 });
         }
-        // fallback to text-only if provided
         picked = {
           hash: undefined,
           text: forceText,
@@ -97,7 +96,7 @@ async function handle(req: NextRequest) {
     if (!picked && forceHash) {
       const r = await fetch(
         `https://api.neynar.com/v2/farcaster/cast?identifier=${encodeURIComponent(forceHash)}&type=hash`,
-        { headers: { 'api_key': apiKey } }
+        { headers: { 'x-api-key': apiKey } }
       );
 
       if (!r.ok) {
@@ -105,7 +104,6 @@ async function handle(req: NextRequest) {
         if (!forceText) {
           return NextResponse.json({ ok: false, error: errTxt || 'force_fetch_failed' }, { status: 500 });
         }
-        // fallback to text-only if provided
         picked = {
           hash: forceHash,
           text: forceText,
@@ -173,12 +171,14 @@ async function handle(req: NextRequest) {
   }
 }
 
-// Allow GET so you can call ?debug=1 from the browser
 export async function GET(req: NextRequest) {
   return handle(req);
 }
 
 export async function POST(req: NextRequest) {
+  return handle(req);
+}
+c function POST(req: NextRequest) {
   return handle(req);
 }
 
