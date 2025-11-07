@@ -2,7 +2,22 @@
   "name": "cool-not-cool",
   "private": true,
   "version": "1.0.3",
-  "scripts": { "dev": "next dev", "build": "next build", "start": "next start" },
-  "dependencies": { "@vercel/kv": "^1.0.1", "next": "^14.2.0", "react": "^18.3.1", "react-dom": "^18.3.1" },
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "@vercel/kv": "^1.0.1",
+    "next": "^14.2.0",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "typescript": "^5.6.3",
+    "@types/react": "^18.3.5",
+    "@types/react-dom": "^18.3.0",
+    "@types/node": "^20.11.30"
+  },
   "type": "module"
 }
