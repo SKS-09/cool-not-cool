@@ -41,7 +41,6 @@ export async function POST(req: NextRequest) {
     // ---------- FORCE MODE ----------
     if (forceHash) {
       // Try Neynar "cast by hash" endpoint first
-      // (supports shapes like: { cast: {...} } or direct {...})
       const r = await fetch(
         `https://api.neynar.com/v2/farcaster/cast?identifier=${encodeURIComponent(forceHash)}&type=hash`,
         { headers: { 'api_key': apiKey } }
@@ -116,8 +115,5 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ ok: true, date, picked, mode });
   } catch (e: any) {
     return NextResponse.json({ ok: false, error: String(e?.message || e) }, { status: 500 });
-  }
-}
-
   }
 }
