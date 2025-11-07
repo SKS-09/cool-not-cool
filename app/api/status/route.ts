@@ -1,0 +1,5 @@
+import { NextResponse } from 'next/server'; import { kv } from '@vercel/kv'; import { istDateStr, yesterdayIST } from '../../../lib/ist'; export const runtime='edge';
+export async function GET(){ const today=istDateStr(); const daily=await kv.get(`daily:${today}`); if(daily) return NextResponse.json({ok:true,phase:'voting',date:today,cast:daily});
+const y=yesterdayIST(); const yDaily=await kv.get(`daily:${y}`); const yVotes=await kv.hgetall<Record<string,number>>(`votes:${y}`); if(!yDaily) return NextResponse.json({ok:false,reason:'no_daily'});
+const cool=Number(yVotes?.cool||0), notcool=Number(yVotes?.notcool||0); const total=cool+notcool; const percent= total ? {cool:Math.round((cool/total)*100),notcool:Math.round((notcool/total)*100)} : {cool:0,notcool:0};
+return NextResponse.json({ok:true,phase:'reveal',date:y,cast:yDaily,totals:{cool,notcool,total},percent}); }

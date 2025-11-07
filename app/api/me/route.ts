@@ -1,0 +1,2 @@
+import { NextRequest, NextResponse } from 'next/server'; import { getSessionCookie } from '../../../lib/session'; export const runtime='nodejs';
+export async function GET(req:NextRequest){ const u=getSessionCookie(req as unknown as Request); return NextResponse.json({user:u||null}); }

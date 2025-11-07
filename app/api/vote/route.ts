@@ -1,0 +1,6 @@
+import { NextRequest, NextResponse } from 'next/server'; import { kv } from '@vercel/kv'; import { istDateStr } from '../../../lib/ist'; import { getSessionCookie } from '../../../lib/session'; export const runtime='nodejs';
+export async function POST(req:NextRequest){ const {choice}=await req.json().catch(()=>({choice:''})); if(!['cool','notcool'].includes(choice)) return NextResponse.json({ok:false,error:'invalid_choice'},{status:400});
+const user=getSessionCookie(req as unknown as Request); if(!user?.fid) return NextResponse.json({ok:false,error:'signin_required'},{status:401});
+const today=istDateStr(); const daily=await kv.get(`daily:${today}`); if(!daily) return NextResponse.json({ok:false,error:'voting_closed_or_not_started'},{status:400});
+const already=await kv.sismember(`voters:${today}`,String(user.fid)); if(already) return NextResponse.json({ok:false,error:'already_voted'},{status:429});
+await kv.hincrby(`votes:${today}`,choice,1); await kv.sadd(`voters:${today}`,String(user.fid)); return NextResponse.json({ok:true}); }

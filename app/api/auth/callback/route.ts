@@ -1,0 +1,7 @@
+import { NextRequest, NextResponse } from 'next/server'; import { setSessionCookie } from '../../../../lib/session'; export const runtime='nodejs';
+export async function GET(req:NextRequest){ const {searchParams}=new URL(req.url); const code=searchParams.get('code'); if(!code) return NextResponse.json({ok:false,error:'missing_code'},{status:400});
+const tokenRes=await fetch('https://www.neynar.com/oauth/token',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({client_id:process.env.NEYNAR_CLIENT_ID,client_secret:process.env.NEYNAR_CLIENT_SECRET,grant_type:'authorization_code',redirect_uri:process.env.NEYNAR_REDIRECT_URI,code})});
+const token=await tokenRes.json(); const access=token.access_token; if(!access) return NextResponse.json({ok:false,error:'no_access_token'},{status:400});
+const meRes=await fetch('https://api.neynar.com/v2/farcaster/user',{headers:{'api_key':process.env.NEYNAR_API_KEY!,'Authorization':`Bearer ${access}`}}); const me=await meRes.json();
+const user={ fid:me?.user?.fid||me?.fid, username:me?.user?.username||me?.username, display_name:me?.user?.display_name||me?.display_name, pfp_url:me?.user?.pfp_url||me?.pfp_url };
+const headers=new Headers(); setSessionCookie(headers,user); headers.append('Location','/'); return new NextResponse(null,{status:302,headers}); }

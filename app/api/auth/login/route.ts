@@ -1,0 +1,3 @@
+import { NextResponse } from 'next/server'; export const runtime='edge';
+export async function GET(){ const base='https://www.neynar.com/oauth/authorize'; const url=new URL(base); url.searchParams.set('client_id',process.env.NEYNAR_CLIENT_ID!);
+url.searchParams.set('redirect_uri',process.env.NEYNAR_REDIRECT_URI!); url.searchParams.set('response_type','code'); url.searchParams.set('scope','openid'); return NextResponse.redirect(url.toString()); }
